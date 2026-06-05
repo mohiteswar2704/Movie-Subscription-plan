@@ -1,0 +1,45 @@
+# Project root ignores
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+.env
+
+# Java / Maven
+target/
+*.class
+*.jar
+*.war
+.mvn/wrapper/maven-wrapper.jar
+
+# Node
+node_modules/
+dist/
+dist-ssr/
+
+# IDE
+.vscode/
+.idea/
+*.iml
+*.iws
+.classpath
+.project
+.settings
+.factorypath
+.apt_generated
+.springBeans
+.sts4-cache
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Secrets - local config with DB credentials
+application-local.properties
+application-secret.properties

@@ -1,0 +1,39 @@
+<svg width="1400" height="400" viewBox="0 0 1400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1400" y2="400" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0F172A" />
+      <stop offset="1" stop-color="#1E293B" />
+    </linearGradient>
+    <linearGradient id="icon" x1="60" y1="70" x2="250" y2="310" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38BDF8" />
+      <stop offset="0.5" stop-color="#2563EB" />
+      <stop offset="1" stop-color="#22D3EE" />
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#F8FAFC" />
+      <stop offset="1" stop-color="#BFDBFE" />
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="10" stdDeviation="16" flood-color="#020617" flood-opacity="0.5" />
+    </filter>
+  </defs>
+
+  <g filter="url(#shadow)">
+    <circle cx="170" cy="200" r="120" fill="url(#icon)" />
+    <circle cx="170" cy="200" r="84" fill="none" stroke="url(#accent)" stroke-width="14" opacity="0.95" />
+    <path d="M144 158L220 200L144 242V158Z" fill="url(#accent)" />
+    <rect x="88" y="102" width="20" height="196" rx="10" fill="#38BDF8" opacity="0.85" />
+    <rect x="78" y="118" width="40" height="12" rx="6" fill="#38BDF8" opacity="0.85" />
+    <rect x="78" y="154" width="40" height="12" rx="6" fill="#38BDF8" opacity="0.65" />
+    <rect x="78" y="190" width="40" height="12" rx="6" fill="#38BDF8" opacity="0.85" />
+    <rect x="78" y="226" width="40" height="12" rx="6" fill="#38BDF8" opacity="0.65" />
+    <rect x="78" y="262" width="40" height="12" rx="6" fill="#38BDF8" opacity="0.85" />
+  </g>
+
+  <text x="330" y="176" font-family="Segoe UI, Arial, sans-serif" font-size="82" font-weight="800" fill="#E2E8F0">Movie Time</text>
+  <text x="330" y="240" font-family="Segoe UI, Arial, sans-serif" font-size="38" font-weight="600" letter-spacing="0.22em" fill="#7DD3FC">STREAMING • SUBSCRIPTION • CONTROL</text>
+  <rect x="332" y="268" width="520" height="8" rx="4" fill="url(#icon)" opacity="0.95" />
+  <circle cx="990" cy="130" r="16" fill="#F59E0B" />
+  <circle cx="1030" cy="162" r="10" fill="#38BDF8" />
+  <circle cx="1070" cy="124" r="14" fill="#22C55E" />
+</svg>

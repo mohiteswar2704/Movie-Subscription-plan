@@ -1,0 +1,176 @@
+.umanager {
+    display: grid;
+    grid-template-rows: auto auto 1fr auto;
+    gap: 16px;
+    min-height: 100%;
+}
+
+.umanager .umanager-header {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.umanager .umanager-header label {
+    font-size: 1.7rem;
+    font-weight: 800;
+}
+
+.umanager .umanager-header p {
+    margin: 8px 0 0;
+    color: var(--text-gray);
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: min(440px, 100%);
+    padding: 12px 14px;
+    border-radius: 18px;
+    background: rgba(15, 23, 42, 0.04);
+}
+
+.search-bar img {
+    width: 18px;
+    height: 18px;
+}
+
+.search-bar input {
+    width: 100%;
+    border: none;
+    background: transparent;
+}
+
+.umanager-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    color: var(--text-gray);
+    flex-wrap: wrap;
+}
+
+.sort-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.sort-buttons button,
+.plan-actions button,
+.umanager-footer button {
+    border: none;
+    border-radius: 999px;
+    padding: 10px 14px;
+    background: rgba(15, 23, 42, 0.08);
+    color: #0f172a;
+    cursor: pointer;
+}
+
+.sort-buttons button.active {
+    background: linear-gradient(135deg, #0f172a, #2563eb);
+    color: #fff;
+}
+
+.umanager-content {
+    overflow: auto;
+}
+
+.umanager .plan-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.umanager .plan-card {
+    padding: 20px;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.84);
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    box-shadow: 0 16px 34px rgba(15, 23, 42, 0.08);
+    /* Ensure text is readable on the light card background */
+    color: #0f172a;
+}
+
+.umanager .plan-card.current {
+    border-color: rgba(37, 99, 235, 0.22);
+    box-shadow: 0 20px 42px rgba(37, 99, 235, 0.14);
+}
+
+.plan-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.plan-head span,
+.plan-head label,
+.plan-card p {
+    color: inherit;
+}
+
+.umanager-footer {
+    color: var(--text-gray);
+}
+
+.plan-price {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin: 14px 0;
+}
+
+.plan-price strong {
+    font-size: 2rem;
+    color: #0f172a;
+}
+
+.plan-specs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.plan-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 18px;
+}
+
+.plan-actions button {
+    background: linear-gradient(135deg, #0f172a, #2563eb);
+    color: #fff;
+}
+
+.plan-actions .ghost {
+    background: rgba(15, 23, 42, 0.08);
+    color: #0f172a;
+}
+
+.umanager-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-size: 9pt;
+}
+
+@media (max-width: 900px) {
+    .umanager .plan-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .umanager .umanager-header,
+    .umanager-toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .search-bar {
+        min-width: 100%;
+    }
+}

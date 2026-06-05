@@ -1,0 +1,60 @@
+Subscription and Plan Management API
+====================================
+
+This gateway now exposes subscription and plan management routes alongside auth.
+
+Available routes
+----------------
+
+- GET `/subscriptionservice/plans` - view active plans
+- GET `/subscriptionservice/plans/{plan_id}` - inspect one plan
+- POST `/subscriptionservice/plans/search` - intelligent search by need or keyword
+- GET `/subscriptionservice/plans/search?query=...` - same search via query parameter
+- POST `/subscriptionservice/subscriptions` - subscribe a user to a plan
+- GET `/subscriptionservice/subscriptions/{subscription_id}` - track a subscription
+- GET `/subscriptionservice/subscriptions/user/{user_id}` - list a user's subscriptions
+- PATCH `/subscriptionservice/subscriptions/{subscription_id}/status` - update status
+- POST `/subscriptionservice/subscriptions/{subscription_id}/change` - change plans
+
+Sample SQL tables
+-----------------
+
+```sql
+CREATE TABLE users (
+	user_id VARCHAR(64) PRIMARY KEY,
+	fullname VARCHAR(120) NOT NULL,
+	phone VARCHAR(30),
+	email VARCHAR(120) UNIQUE NOT NULL,
+	password VARCHAR(255) NOT NULL,
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE plans (
+	plan_id VARCHAR(64) PRIMARY KEY,
+	name VARCHAR(120) NOT NULL,
+	description TEXT NOT NULL,
+	price DECIMAL(10,2) NOT NULL,
+	billing_cycle VARCHAR(20) NOT NULL,
+	active BOOLEAN DEFAULT TRUE,
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE subscriptions (
+	subscription_id VARCHAR(64) PRIMARY KEY,
+	user_id VARCHAR(64) NOT NULL,
+	plan_id VARCHAR(64) NOT NULL,
+	status VARCHAR(20) NOT NULL,
+	started_at TIMESTAMP NOT NULL,
+	updated_at TIMESTAMP NOT NULL,
+	next_billing_date TIMESTAMP,
+	FOREIGN KEY (user_id) REFERENCES users(user_id),
+	FOREIGN KEY (plan_id) REFERENCES plans(plan_id)
+);
+```
+
+Setup
+-----
+
+1. Activate the virtual environment with `venv\Scripts\activate`.
+2. Install dependencies with `pip install -r requirements.txt`.
+3. Run the gateway with `python run.py`.

@@ -1,0 +1,60 @@
+:root {
+  --primary-color: #38bdf8;
+  --secondary-color: #0ea5e9;
+  --text-dark: #e2e8f0;
+  --primary-blue: #2563eb;
+  --primary-green: #22c55e;
+  --text-gray: #94a3b8;
+  --accent-gray: #94a3b8;
+  --background: #ffffff;
+  --border-gray: rgba(148, 163, 184, 0.2);
+  --error-background: #3f1f2b;
+  --border-color: #d8dee9;
+  --background-secondary: #0f172a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  width: 100%;
+  min-height: 100%;
+  font-family: "Aptos", "Segoe UI", "Trebuchet MS", sans-serif;
+  font-size: 10pt;
+  color: var(--text-dark);
+}
+
+body {
+  background:
+    radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), transparent 26%),
+    radial-gradient(circle at top right, rgba(14, 165, 233, 0.1), transparent 22%),
+    radial-gradient(circle at 80% 88%, rgba(15, 118, 110, 0.1), transparent 24%),
+    linear-gradient(135deg, #0b1020 0%, #15223a 48%, #1f3b57 100%);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid rgba(56, 189, 248, 0.38);
+  outline-offset: 2px;
+}
+
+.progress {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: url("/loading.gif") no-repeat center center rgba(255, 255, 255, 0.38);
+  background-size: 56px 56px;
+}
