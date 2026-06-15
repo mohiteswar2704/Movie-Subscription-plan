@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import mth.models.Subscription;
+import mth.models.Subscrip
 
 public interface SubscriptionRepository extends JpaRepository<Subscription, Long> {
 
