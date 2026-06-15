@@ -70,10 +70,8 @@ services:
           name: sdc-taskservices
           property: host
 
-  # 4. React Frontend (Static Site)
-  - type: web
+  - type: static
     name: sdc-frontend
-    env: static
     rootDir: frontend
     buildCommand: npm run build
     publishDir: dist
