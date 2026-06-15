@@ -1,31 +1,19 @@
 const express = require('express');
 const cors = require('cors');
-const { Pool } = require('pg');
 const PDFDocument = require('pdfkit');
+const { connectDB } = require('./db');
+const { User, Plan, Subscription } = require('./models');
+const { syncUserAndSubscription, syncSubscriptionById } = require('./sync');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Middleware
 app.use(cors());
 app.use(express.json());
 
-// PostgreSQL database connection pool configured from properties
-const pool = new Pool({
-  host: 'localhost',
-  port: 5432,
-  database: 'sdcproject',
-  user: 'postgres',
-  password: 'Mohit@2704',
-});
-
-// Test connection
-pool.query('SELECT NOW()', (err, res) => {
-  if (err) {
-    console.error('PostgreSQL Connection Error:', err);
-  } else {
-    console.log('PostgreSQL Connected via Node.js on port 5432');
-  }
-});
+// Initialize Database Connection
+connectDB();
 
 /* ==========================================================================
    NODE.JS CRUD OPERATIONS (Plans API)
@@ -34,10 +22,10 @@ pool.query('SELECT NOW()', (err, res) => {
 // 1. GET ALL PLANS
 app.get('/api/node/plans', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM plans ORDER BY monthly_price ASC');
-    res.status(200).json(result.rows);
+    const plans = await Plan.find().sort({ monthlyPrice: 1 });
+    res.status(200).json(plans);
   } catch (err) {
-    console.error(err);
+    console.error('Error retrieving plans:', err);
     res.status(500).json({ error: 'Failed to retrieve plans' });
   }
 });
@@ -46,13 +34,13 @@ app.get('/api/node/plans', async (req, res) => {
 app.get('/api/node/plans/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await pool.query('SELECT * FROM plans WHERE id = $1', [id]);
-    if (result.rows.length === 0) {
+    const plan = await Plan.findById(id);
+    if (!plan) {
       return res.status(404).json({ error: 'Plan not found' });
     }
-    res.status(200).json(result.rows[0]);
+    res.status(200).json(plan);
   } catch (err) {
-    console.error(err);
+    console.error(`Error retrieving plan ${req.params.id}:`, err);
     res.status(500).json({ error: 'Failed to retrieve plan' });
   }
 });
@@ -63,14 +51,18 @@ app.post('/api/node/plans', async (req, res) => {
     const { planName, description, category, features, monthlyPrice, durationMonths, active } = req.body;
     const isActive = active !== undefined ? active : true;
     
-    const result = await pool.query(
-      `INSERT INTO plans (plan_name, description, category, features, monthly_price, duration_months, active, created_at, updated_at) 
-       VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW()) RETURNING *`,
-      [planName, description, category, features, monthlyPrice, durationMonths || 1, isActive]
-    );
-    res.status(201).json(result.rows[0]);
+    const newPlan = await Plan.create({
+      planName,
+      description,
+      category,
+      features,
+      monthlyPrice,
+      durationMonths: durationMonths || 1,
+      active: isActive
+    });
+    res.status(201).json(newPlan);
   } catch (err) {
-    console.error(err);
+    console.error('Error creating plan:', err);
     res.status(500).json({ error: 'Failed to create plan' });
   }
 });
@@ -79,52 +71,96 @@ app.post('/api/node/plans', async (req, res) => {
 app.delete('/api/node/plans/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await pool.query('DELETE FROM plans WHERE id = $1 RETURNING *', [id]);
-    if (result.rows.length === 0) {
+    const deletedPlan = await Plan.findByIdAndDelete(id);
+    if (!deletedPlan) {
       return res.status(404).json({ error: 'Plan not found' });
     }
-    res.status(200).json({ message: 'Plan deleted successfully', plan: result.rows[0] });
+    res.status(200).json({ message: 'Plan deleted successfully', plan: deletedPlan });
   } catch (err) {
-    console.error(err);
+    console.error(`Error deleting plan ${req.params.id}:`, err);
     res.status(500).json({ error: 'Failed to delete plan' });
   }
 });
 
+/* ==========================================================================
+   GET CURRENT ACTIVE SUBSCRIPTION BY USER EMAIL
+   ========================================================================== */
+app.get('/api/node/current-sub', async (req, res) => {
+  try {
+    const { email } = req.query;
+    if (!email) {
+      return res.status(400).json({ error: 'Email query parameter is required' });
+    }
+    
+    // Run on-demand sync from PostgreSQL to MongoDB for this email
+    await syncUserAndSubscription(email);
+
+    // Case-insensitive query for user email
+    const user = await User.findOne({ email: new RegExp(`^${email}$`, 'i') });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    // Find active subscription for user, sorted by updatedAt desc, populate plan
+    const sub = await Subscription.findOne({ userId: user._id, status: 'ACTIVE' })
+      .sort({ updatedAt: -1 })
+      .populate('planId');
+      
+    if (!sub) {
+      return res.status(404).json({ error: 'No active subscription found for this email' });
+    }
+    
+    // Format renewal date
+    let renewal_date = 'N/A';
+    if (sub.renewalDate) {
+      renewal_date = sub.renewalDate.toISOString().split('T')[0];
+    }
+    
+    res.status(200).json({
+      subscription_id: sub._id,
+      plan_name: sub.planId ? sub.planId.planName : 'N/A',
+      status: sub.status,
+      renewal_date: renewal_date
+    });
+  } catch (err) {
+    console.error('Error retrieving active subscription:', err);
+    res.status(500).json({ error: 'Failed to retrieve active subscription' });
+  }
+});
 
 /* ==========================================================================
    DYNAMIC PDF INVOICE GENERATOR
    ========================================================================== */
-
 app.get('/invoice/:subscriptionId', async (req, res) => {
   try {
     const { subscriptionId } = req.params;
-
-    // Fetch subscription details joining users and plans
-    const query = `
-      SELECT s.id as subscription_id, s.status, s.start_date, s.renewal_date, s.notes,
-             u.fullname, u.email, u.phone,
-             p.plan_name, p.monthly_price, p.duration_months
-      FROM subscriptions s
-      JOIN users u ON s.user_id = u.id
-      JOIN plans p ON s.plan_id = p.id
-      WHERE s.id = $1
-    `;
     
-    const dbResult = await pool.query(query, [subscriptionId]);
-    if (dbResult.rows.length === 0) {
+    // Fetch and sync subscription from PostgreSQL if needed, and populate both user and plan details
+    const sub = await syncSubscriptionById(subscriptionId);
+      
+    if (!sub) {
       return res.status(404).json({ error: 'Subscription invoice record not found' });
     }
-
-    const invoice = dbResult.rows[0];
-
+    
+    const user = sub.userId;
+    const plan = sub.planId;
+    
+    if (!user || !plan) {
+      return res.status(404).json({ error: 'Incomplete subscription record (missing user or plan reference)' });
+    }
+    
+    // Format dates for display
+    const startDateStr = sub.startDate ? sub.startDate.toISOString().split('T')[0] : 'N/A';
+    const renewalDateStr = sub.renewalDate ? sub.renewalDate.toISOString().split('T')[0] : 'N/A';
+    
     // Initialize PDF document
     const doc = new PDFDocument({ margin: 50 });
-
+    
     // Stream PDF directly back as attachment response
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename=invoice-${subscriptionId}.pdf`);
     doc.pipe(res);
-
+    
     // Draw header elements (Red/Dark Premium Accent)
     doc.fillColor('#E50914') // Brand Red
        .fontSize(28)
@@ -148,19 +184,19 @@ app.get('/invoice/:subscriptionId', async (req, res) => {
        .text('CUSTOMER DETAILS', 50, 165, { underline: true });
     doc.fontSize(10)
        .fillColor('#111111')
-       .text(`Name:   ${invoice.fullname}`, 50, 185)
-       .text(`Email:  ${invoice.email}`, 50, 200)
-       .text(`Phone:  ${invoice.phone || 'N/A'}`, 50, 215);
+       .text(`Name:   ${user.fullname}`, 50, 185)
+       .text(`Email:  ${user.email}`, 50, 200)
+       .text(`Phone:  ${user.phone || 'N/A'}`, 50, 215);
 
     doc.fontSize(11)
        .fillColor('#333333')
        .text('INVOICE INFORMATION', 330, 165, { underline: true });
     doc.fontSize(10)
        .fillColor('#111111')
-       .text(`Invoice Number: MT-SUB-${invoice.subscription_id}`, 330, 185)
-       .text(`Status:         ${invoice.status.toUpperCase()}`, 330, 200)
-       .text(`Start Date:     ${invoice.start_date}`, 330, 215)
-       .text(`Renewal Date:   ${invoice.renewal_date || 'N/A'}`, 330, 230);
+       .text(`Invoice Number: MT-SUB-${sub._id}`, 330, 185)
+       .text(`Status:         ${sub.status.toUpperCase()}`, 330, 200)
+       .text(`Start Date:     ${startDateStr}`, 330, 215)
+       .text(`Renewal Date:   ${renewalDateStr}`, 330, 230);
 
     doc.moveTo(50, 260)
        .lineTo(550, 260)
@@ -180,9 +216,9 @@ app.get('/invoice/:subscriptionId', async (req, res) => {
     // Invoice Row Data
     doc.fontSize(10)
        .fillColor('#111111')
-       .text(`${invoice.plan_name} Movie Tier Plan`, 50, 325)
-       .text(invoice.duration_months === 12 ? 'Yearly Cycle' : 'Monthly Cycle', 300, 325)
-       .text(`$${invoice.monthly_price.toFixed(2)}`, 450, 325, { align: 'right' });
+       .text(`${plan.planName} Movie Tier Plan`, 50, 325)
+       .text(plan.durationMonths === 12 ? 'Yearly Cycle' : 'Monthly Cycle', 300, 325)
+       .text(`$${plan.monthlyPrice.toFixed(2)}`, 450, 325, { align: 'right' });
 
     doc.moveTo(50, 355)
        .lineTo(550, 355)
@@ -194,7 +230,7 @@ app.get('/invoice/:subscriptionId', async (req, res) => {
        .text('Total Paid:', 300, 380)
        .fontSize(14)
        .fillColor('#E50914')
-       .text(`$${invoice.monthly_price.toFixed(2)} USD`, 450, 380, { align: 'right' });
+       .text(`$${plan.monthlyPrice.toFixed(2)} USD`, 450, 380, { align: 'right' });
 
     // Terms / Branding footer
     doc.moveTo(50, 450)
@@ -210,37 +246,12 @@ app.get('/invoice/:subscriptionId', async (req, res) => {
     doc.end();
 
   } catch (err) {
-    console.error(err);
+    console.error('Error generating PDF invoice:', err);
     res.status(500).json({ error: 'Failed to generate PDF billing invoice receipt' });
   }
 });
 
-// GET CURRENT SUBSCRIPTION ID BY USER EMAIL
-app.get('/api/node/current-sub', async (req, res) => {
-  try {
-    const { email } = req.query;
-    if (!email) {
-      return res.status(400).json({ error: 'Email query parameter is required' });
-    }
-    const query = `
-      SELECT s.id as subscription_id, p.plan_name, s.status, s.renewal_date
-      FROM subscriptions s
-      JOIN users u ON s.user_id = u.id
-      JOIN plans p ON s.plan_id = p.id
-      WHERE LOWER(u.email) = LOWER($1) AND s.status = 'ACTIVE'
-      ORDER BY s.updated_at DESC LIMIT 1
-    `;
-    const result = await pool.query(query, [email]);
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'No active subscription found for this email' });
-    }
-    res.status(200).json(result.rows[0]);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to retrieve active subscription' });
-  }
-});
-
+// Start Express Server
 app.listen(PORT, () => {
-  console.log(`Node.js microservice running on port ${PORT}`);
+  console.log(`Node.js billing microservice running on port ${PORT}`);
 });

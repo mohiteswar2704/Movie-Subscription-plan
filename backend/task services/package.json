@@ -1,7 +1,7 @@
 {
-  "name": "nodeservice",
+  "name": "task-services",
   "version": "1.0.0",
-  "description": "Node.js Billing & PDF Invoice Microservice",
+  "description": "Node.js Express & MongoDB Billing/Invoice Service",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -9,7 +9,10 @@
   },
   "dependencies": {
     "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
     "express": "^4.21.2",
+    "mongodb": "^7.3.0",
+    "mongoose": "^8.2.1",
     "pdfkit": "^0.16.0",
     "pg": "^8.13.1"
   },
