@@ -17,11 +17,12 @@ redoc_url = f"{BASE_PATH}/redoc" if BASE_PATH else "/redoc"
 app = FastAPI(docs_url=docs_url, openapi_url=openapi_url, redoc_url=redoc_url)
 
 # Enable CORS
-origins = ["http://localhost:5173"]  # if you want to allow request from all then use "*"
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173").split(",")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=ALLOWED_ORIGINS,
+    allow_origin_regex="https://.*\\.vercel\\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
