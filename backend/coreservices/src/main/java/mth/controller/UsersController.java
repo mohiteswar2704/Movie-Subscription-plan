@@ -2,7 +2,6 @@ package mth.controller;
 
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,8 +17,11 @@ import mth.services.UsersService;
 @RequestMapping("/user")
 public class UsersController {
 
-	@Autowired
-	UsersService US;
+	private final UsersService US;
+
+	public UsersController(UsersService US) {
+		this.US = US;
+	}
 	
 	@PostMapping("/signup")
 	public Object signup(@RequestBody Users U)

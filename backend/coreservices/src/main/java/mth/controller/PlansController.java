@@ -1,6 +1,5 @@
 package mth.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,8 +15,11 @@ import mth.services.PlanService;
 @RequestMapping("/plans")
 public class PlansController {
 
-	@Autowired
-	PlanService PS;
+	private final PlanService PS;
+
+	public PlansController(PlanService PS) {
+		this.PS = PS;
+	}
 
 	@GetMapping
 	public Object getAllPlans() {

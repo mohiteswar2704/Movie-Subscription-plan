@@ -1,6 +1,5 @@
 package mth.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,8 +15,11 @@ import mth.services.SubscriptionService;
 @RequestMapping("/subscriptions")
 public class SubscriptionsController {
 
-	@Autowired
-	SubscriptionService SS;
+	private final SubscriptionService SS;
+
+	public SubscriptionsController(SubscriptionService SS) {
+		this.SS = SS;
+	}
 
 	@PostMapping("/subscribe/{planId}")
 	public Object subscribe(@RequestHeader("Token") String token, @PathVariable("planId") Long planId) {

@@ -4,19 +4,20 @@
 
 .profile .subscription-summary {
     display: grid;
-    gap: 18px;
+    gap: 16px;
     min-height: 100%;
 }
 
 .profile .subscription-summary .info {
     padding: 20px;
-    border-radius: 24px;
-    background: linear-gradient(135deg, rgba(15, 23, 42, 0.94), rgba(37, 99, 235, 0.9));
+    border-radius: 18px;
+    background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #4f46e5 100%);
     color: #fff;
     display: flex;
     align-items: center;
     gap: 18px;
     flex-wrap: wrap;
+    box-shadow: 0 8px 24px rgba(37, 99, 235, 0.22);
 }
 
 .admin-tools {
@@ -26,26 +27,27 @@
     gap: 12px;
     padding: 12px 18px;
     border-radius: 14px;
-    background: linear-gradient(135deg, rgba(30,41,59,0.9), rgba(15,23,42,0.9));
-    border: 1px solid rgba(56,189,248,0.06);
-    color: #e6eef8;
+    background: #f8faff;
+    border: 1px solid #dde4f0;
+    color: #1e293b;
 }
 
 .admin-tools-actions button {
     margin-left: 8px;
-    padding: 8px 12px;
+    padding: 8px 14px;
     border-radius: 10px;
-    border: none;
-    background: linear-gradient(135deg, #0f172a, #2563eb);
-    color: #fff;
+    border: 1px solid #bfdbfe;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-weight: 600;
     cursor: pointer;
 }
 
 .profile .subscription-summary .info img {
-    width: 88px;
-    height: 88px;
+    width: 84px;
+    height: 84px;
     border-radius: 999px;
-    border: 2px solid rgba(255, 255, 255, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.5);
 }
 
 .profile .subscription-summary .info .info-data {
@@ -55,72 +57,90 @@
 }
 
 .profile .subscription-summary .info .info-data label {
-    font-size: 1.8rem;
+    font-size: 1.7rem;
     font-weight: 800;
 }
 
 .profile .subscription-summary .info .info-data span {
     color: rgba(255, 255, 255, 0.82);
+    font-size: 9.5pt;
 }
 
 .status-pill {
     margin-left: auto;
-    padding: 10px 14px;
+    padding: 8px 16px;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.28);
     font-size: 9pt;
     text-transform: uppercase;
     letter-spacing: 0.08em;
+    font-weight: 700;
 }
 
 .profile .subscription-summary .details {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 14px;
+    gap: 12px;
 }
 
 .profile .subscription-summary .details .grid {
     display: grid;
     gap: 8px;
     padding: 18px;
-    border-radius: 20px;
-    background: rgba(15, 23, 42, 0.04);
+    border-radius: 16px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.05);
 }
 
 .profile .subscription-summary .details .grid span {
-    color: var(--text-gray);
+    color: #64748b;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     font-size: 9pt;
+    font-weight: 600;
 }
 
 .profile .subscription-summary .details .grid strong {
     font-size: 1rem;
+    color: #1e293b;
 }
 
 .subscription-actions {
     display: flex;
-    gap: 12px;
+    gap: 10px;
     flex-wrap: wrap;
 }
 
 .subscription-actions button {
     border: none;
     border-radius: 999px;
-    padding: 12px 18px;
-    color: #fff;
-    background: linear-gradient(135deg, #0f172a, #2563eb);
+    padding: 11px 20px;
+    font-weight: 600;
     cursor: pointer;
+    background: linear-gradient(135deg, #2563eb, #4f46e5);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.22);
+    transition: opacity 0.15s ease;
+}
+
+.subscription-actions button:hover {
+    opacity: 0.88;
 }
 
 .subscription-actions .ghost {
-    background: rgba(15, 23, 42, 0.08);
-    color: #0f172a;
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+    box-shadow: none;
 }
 
 .subscription-actions .danger {
-    background: rgba(220, 38, 38, 0.12);
+    background: #fef2f2;
     color: #b91c1c;
+    border: 1px solid #fecaca;
+    box-shadow: none;
 }
 
 @media (max-width: 760px) {

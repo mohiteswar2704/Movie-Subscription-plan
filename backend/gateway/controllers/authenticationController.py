@@ -18,7 +18,7 @@ import httpx
 router = APIRouter(prefix="/authservice")
 subscription_router = APIRouter(prefix="/subscriptionservice")
 
-SPRING_URL = "http://localhost:8001/"
+SPRING_URL = "http://localhost:8080/"
 HTTP_CLIENT = httpx.AsyncClient(timeout=30.0)
 
 PLAN_INDEX = {

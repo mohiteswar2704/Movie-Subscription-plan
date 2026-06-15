@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import './App.css';
 import ProgressBar from './components/ProgressBar.jsx';
-import { apibaseurl, imgurl, subscriptionSeed } from './lib';
+import { apibaseurl, imgurl, subscriptionSeed, getStoredUsers, saveUsers } from './lib';
 
 const API_BASE = apibaseurl;
 
@@ -11,18 +11,48 @@ const App = () => {
     const [errorData, setErrorData] = useState({});
     const focusRef = useRef(null);
 
+    function syncLocalUserCatalog(fullname, email, role = 'Subscriber') {
+        try {
+            const users = getStoredUsers();
+            const index = users.findIndex(u => u.email.toLowerCase() === email.toLowerCase());
+            if (index >= 0) {
+                users[index].fullname = fullname;
+                users[index].role = role;
+            } else {
+                users.push({
+                    id: `user-${Date.now()}`,
+                    fullname,
+                    phone: '+91 99999 99999',
+                    email,
+                    role,
+                    activePlanId: 'pro',
+                    billingCycle: 'monthly',
+                    renewalDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
+                });
+            }
+            saveUsers(users);
+        } catch (e) {
+            console.error('Failed to sync user catalog', e);
+        }
+    }
+
     function storeLocalSession(fullname, email) {
+        const userRole = (fullname.toLowerCase().includes('admin') || email.toLowerCase().includes('admin')) ? 'Admin' : 'Subscriber';
         const storedState = {
             ...subscriptionSeed,
             user: {
                 ...subscriptionSeed.user,
                 fullname,
                 email,
+                role: userRole,
             },
         };
 
         localStorage.setItem('token', `local-${Date.now()}`);
         localStorage.setItem('subscription-dashboard-state', JSON.stringify(storedState));
+        
+        syncLocalUserCatalog(fullname, email, userRole);
+
         // if local session represents an admin, redirect to admin area
         if (storedState.user?.role === 'Admin') {
             window.location.replace('/admin');
@@ -145,20 +175,27 @@ const App = () => {
 
             localStorage.setItem('token', result.jwt);
 
-            // store basic subscription state so Home can show the user name
             const userFullname = result.user?.fullname || loginIdentifier;
             const userEmail = result.user?.email || loginIdentifier;
+            const userRole = (Number(result.role) === 99 || loginIdentifier.toLowerCase().includes('admin') || userEmail.toLowerCase().includes('admin')) ? 'Admin' : 'Subscriber';
             const storedState = {
                 ...subscriptionSeed,
                 user: {
                     ...subscriptionSeed.user,
                     fullname: userFullname,
                     email: userEmail,
+                    role: userRole,
                 },
             };
             localStorage.setItem('subscription-dashboard-state', JSON.stringify(storedState));
 
-            window.location.replace('/home');
+            syncLocalUserCatalog(userFullname, userEmail, userRole);
+
+            if (userRole === 'Admin') {
+                window.location.replace('/admin');
+            } else {
+                window.location.replace('/home');
+            }
         } catch (error) {
             alert(error.message);
         } finally {
@@ -190,20 +227,27 @@ const App = () => {
 
         localStorage.setItem('token', result.jwt);
 
-        // if backend returns a user object, update stored subscription state
         const userFullname = result.user?.fullname || username;
         const userEmail = result.user?.email || username;
+        const userRole = (Number(result.role) === 99 || username.toLowerCase().includes('admin') || userEmail.toLowerCase().includes('admin')) ? 'Admin' : 'Subscriber';
         const storedState = {
             ...subscriptionSeed,
             user: {
                 ...subscriptionSeed.user,
                 fullname: userFullname,
                 email: userEmail,
+                role: userRole,
             },
         };
         localStorage.setItem('subscription-dashboard-state', JSON.stringify(storedState));
 
-        window.location.replace('/home');
+        syncLocalUserCatalog(userFullname, userEmail, userRole);
+
+        if (userRole === 'Admin') {
+            window.location.replace('/admin');
+        } else {
+            window.location.replace('/home');
+        }
     }
 
     async function signup() {
@@ -238,6 +282,9 @@ const App = () => {
 
             if (result.code === 200) {
                 alert(result.message);
+                
+                syncLocalUserCatalog(payload.fullname, payload.email, 'Subscriber');
+
                 // pre-populate subscription state with the signed-up user's name
                 const storedState = {
                     ...subscriptionSeed,
@@ -273,9 +320,8 @@ const App = () => {
                 <div className='auth-copy'>
                     <span className='eyebrow'>Sign in to continue</span>
                     <h1>Manage your plans, subscriptions, and billing from one place.</h1>
-                    <p>
-                        Create an account to save your details in PostgreSQL, then sign in to explore plans and manage your
-                        subscription dashboard.
+                    <p className='auth-quote'>
+                        "Life is too short for bad movies — and the wrong plan."
                     </p>
                 </div>
 

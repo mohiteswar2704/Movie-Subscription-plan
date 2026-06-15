@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import mth.models.Plan;
@@ -18,17 +17,17 @@ import mth.repository.UsersRepository;
 @Service
 public class SubscriptionService {
 
-	@Autowired
-	SubscriptionRepository SR;
+	private final SubscriptionRepository SR;
+	private final PlanRepository PR;
+	private final UsersRepository UR;
+	private final JwtService JWT;
 
-	@Autowired
-	PlanRepository PR;
-
-	@Autowired
-	UsersRepository UR;
-
-	@Autowired
-	JwtService JWT;
+	public SubscriptionService(SubscriptionRepository SR, PlanRepository PR, UsersRepository UR, JwtService JWT) {
+		this.SR = SR;
+		this.PR = PR;
+		this.UR = UR;
+		this.JWT = JWT;
+	}
 
 	public Object subscribe(String token, Long planId) {
 		Map<String, Object> response = new HashMap<>();

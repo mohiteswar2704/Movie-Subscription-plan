@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from controllers.init import *
+from controllers.init import AuthenticationRouter, SubscriptionRouter
 import os
 
 # Optional base path to namespace this service and avoid route collisions.

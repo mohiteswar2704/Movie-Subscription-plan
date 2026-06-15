@@ -146,3 +146,72 @@ export function savePlans(plans) {
         return false;
     }
 }
+
+export const defaultUsers = [
+    {
+        id: "user-1",
+        fullname: "Aarav Mehta",
+        phone: "+91 98765 43210",
+        email: "aarav@streamflow.com",
+        role: "Subscriber",
+        activePlanId: "pro",
+        billingCycle: "monthly",
+        renewalDate: "2026-07-14",
+    },
+    {
+        id: "user-2",
+        fullname: "Priya Sharma",
+        phone: "+91 91234 56789",
+        email: "priya@streamflow.com",
+        role: "Subscriber",
+        activePlanId: "elite",
+        billingCycle: "yearly",
+        renewalDate: "2027-06-14",
+    },
+    {
+        id: "user-3",
+        fullname: "Vikram Singh",
+        phone: "+91 98123 45670",
+        email: "vikram@streamflow.com",
+        role: "Subscriber",
+        activePlanId: "starter",
+        billingCycle: "monthly",
+        renewalDate: "2026-07-05",
+    },
+    {
+        id: "user-4",
+        fullname: "Neha Patel",
+        phone: "+91 95555 12345",
+        email: "neha@streamflow.com",
+        role: "Admin",
+        activePlanId: "pro",
+        billingCycle: "yearly",
+        renewalDate: "2027-02-18",
+    }
+];
+
+const USERS_STORAGE_KEY = 'subscription-users-v1';
+
+export function getStoredUsers() {
+    try {
+        const raw = localStorage.getItem(USERS_STORAGE_KEY);
+        if (!raw) {
+            localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(defaultUsers));
+            return defaultUsers.slice();
+        }
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length) return parsed;
+        return defaultUsers.slice();
+    } catch {
+        return defaultUsers.slice();
+    }
+}
+
+export function saveUsers(users) {
+    try {
+        localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+        return true;
+    } catch {
+        return false;
+    }
+}

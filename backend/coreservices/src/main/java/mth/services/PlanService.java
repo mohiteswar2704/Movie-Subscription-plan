@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import mth.models.Plan;
@@ -14,8 +13,11 @@ import mth.repository.PlanRepository;
 @Service
 public class PlanService {
 
-	@Autowired
-	PlanRepository PR;
+	private final PlanRepository PR;
+
+	public PlanService(PlanRepository PR) {
+		this.PR = PR;
+	}
 
 	public Object getAllPlans() {
 		Map<String, Object> response = new HashMap<>();

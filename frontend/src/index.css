@@ -1,16 +1,16 @@
 :root {
-  --primary-color: #38bdf8;
-  --secondary-color: #0ea5e9;
-  --text-dark: #e2e8f0;
+  --primary-color: #2563eb;
+  --secondary-color: #1d4ed8;
+  --text-dark: #1e293b;
   --primary-blue: #2563eb;
-  --primary-green: #22c55e;
-  --text-gray: #94a3b8;
+  --primary-green: #16a34a;
+  --text-gray: #64748b;
   --accent-gray: #94a3b8;
-  --background: #ffffff;
-  --border-gray: rgba(148, 163, 184, 0.2);
-  --error-background: #3f1f2b;
-  --border-color: #d8dee9;
-  --background-secondary: #0f172a;
+  --background: #f1f5f9;
+  --border-gray: #e2e8f0;
+  --error-background: #fef2f2;
+  --border-color: #e2e8f0;
+  --background-secondary: #ffffff;
 }
 
 * {
@@ -29,11 +29,7 @@ body,
 }
 
 body {
-  background:
-    radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), transparent 26%),
-    radial-gradient(circle at top right, rgba(14, 165, 233, 0.1), transparent 22%),
-    radial-gradient(circle at 80% 88%, rgba(15, 118, 110, 0.1), transparent 24%),
-    linear-gradient(135deg, #0b1020 0%, #15223a 48%, #1f3b57 100%);
+  background: #f1f5f9;
 }
 
 button,
@@ -47,7 +43,7 @@ button:focus,
 input:focus,
 select:focus,
 textarea:focus {
-  outline: 2px solid rgba(56, 189, 248, 0.38);
+  outline: 2px solid rgba(37, 99, 235, 0.35);
   outline-offset: 2px;
 }
 
@@ -55,6 +51,6 @@ textarea:focus {
   position: fixed;
   inset: 0;
   z-index: 999;
-  background: url("/loading.gif") no-repeat center center rgba(255, 255, 255, 0.38);
+  background: url("/loading.gif") no-repeat center center rgba(255, 255, 255, 0.72);
   background-size: 56px 56px;
 }

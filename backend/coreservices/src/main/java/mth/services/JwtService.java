@@ -29,7 +29,7 @@ public class JwtService {
 			byte[] decoded = Base64.getDecoder().decode(secretBase64);
 			key = Keys.hmacShaKeyFor(decoded);
 		} else {
-			key = Keys.secretKeyFor(io.jsonwebtoken.SignatureAlgorithm.HS256);
+			key = Jwts.SIG.HS256.key().build();
 		}
 	}
 
