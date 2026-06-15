@@ -325,3 +325,92 @@
         padding: 0 12px;
     }
 }
+
+/* ── Active Subscription Banner ──────────────────────────────────── */
+.active-subscription-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
+    border: 1px solid #374151;
+    color: #f3f4f6;
+    margin: 12px 20px 0 20px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.2);
+}
+
+.active-subscription-banner .banner-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.active-subscription-banner .banner-badge {
+    background: #e50914;
+    color: #ffffff;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 8pt;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.active-subscription-banner .banner-details h2 {
+    margin: 0 0 4px 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.active-subscription-banner .banner-details p {
+    margin: 0;
+    font-size: 9.5pt;
+    color: #9ca3af;
+}
+
+.active-subscription-banner .status-active {
+    color: #10b981;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.active-subscription-banner .download-invoice-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: 1px solid #4b5563;
+    background: #1f2937;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 9.5pt;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.active-subscription-banner .download-invoice-btn:hover {
+    background: #374151;
+    border-color: #e50914;
+}
+
+.active-subscription-banner .btn-icon {
+    width: 16px;
+    height: 16px;
+    filter: invert(1);
+}
+
+@media (max-width: 768px) {
+    .active-subscription-banner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+        margin: 12px 12px 0 12px;
+    }
+    .active-subscription-banner .download-invoice-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}

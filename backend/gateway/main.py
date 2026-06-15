@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from controllers.init import AuthenticationRouter, SubscriptionRouter
+from controllers.init import AuthenticationRouter, SubscriptionRouter, NodeRouter
 import os
 
 # Optional base path to namespace this service and avoid route collisions.
@@ -31,9 +31,11 @@ app.add_middleware(
 if BASE_PATH:
     app.include_router(AuthenticationRouter, prefix=BASE_PATH)
     app.include_router(SubscriptionRouter, prefix=BASE_PATH)
+    app.include_router(NodeRouter, prefix=BASE_PATH)
 else:
     app.include_router(AuthenticationRouter)
     app.include_router(SubscriptionRouter)
+    app.include_router(NodeRouter)
 
 
 @app.get("/")

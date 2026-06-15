@@ -44,6 +44,32 @@ const Home = () => {
         localStorage.setItem('subscription-dashboard-state', JSON.stringify(subscriptionState));
     }, [subscriptionState]);
 
+    const [dbSubscription, setDbSubscription] = useState(null);
+
+    useEffect(() => {
+        const email = subscriptionState.user?.email;
+        if (email) {
+            fetch(`/api/nodeservice/current-sub?email=${encodeURIComponent(email)}`)
+                .then(res => {
+                    if (res.ok) return res.json();
+                    throw new Error('No active database subscription');
+                })
+                .then(data => {
+                    setDbSubscription(data);
+                })
+                .catch(err => {
+                    console.log('No active database subscription found for invoice generation.', err);
+                    setDbSubscription(null);
+                });
+        }
+    }, [subscriptionState]);
+
+    function downloadInvoice() {
+        if (!dbSubscription) return;
+        const subId = dbSubscription.subscription_id;
+        window.open(`/api/nodeservice/invoice/${subId}`, '_blank');
+    }
+
     function logout() {
         localStorage.removeItem('token');
         localStorage.removeItem('subscription-dashboard-state');
@@ -115,6 +141,23 @@ const Home = () => {
                     </button>
                 </div>
             </div>
+            {dbSubscription && (
+                <div className='active-subscription-banner'>
+                    <div className='banner-content'>
+                        <div className='banner-badge'>Active Tier</div>
+                        <div className='banner-details'>
+                            <h2>Your Plan: {dbSubscription.plan_name}</h2>
+                            <p>Status: <span className="status-active">{dbSubscription.status}</span> &bull; Renewal Date: {dbSubscription.renewal_date}</p>
+                        </div>
+                    </div>
+                    <div className='banner-actions'>
+                        <button className='download-invoice-btn' onClick={downloadInvoice}>
+                            <img src={imgurl + 'myprofile.png'} className="btn-icon" alt="" />
+                            Download PDF Receipt
+                        </button>
+                    </div>
+                </div>
+            )}
             <div className='home-workspace-simple' style={{ padding: '0 20px', minHeight: '0', overflow: 'auto' }}>
                 <UserManager
                     plans={getStoredPlans()}

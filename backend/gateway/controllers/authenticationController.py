@@ -17,8 +17,10 @@ import httpx
 
 router = APIRouter(prefix="/authservice")
 subscription_router = APIRouter(prefix="/subscriptionservice")
+node_router = APIRouter(prefix="/nodeservice")
 
 SPRING_URL = "http://localhost:8080/"
+NODE_URL = "http://localhost:5000/"
 HTTP_CLIENT = httpx.AsyncClient(timeout=30.0)
 
 PLAN_INDEX = {
@@ -255,3 +257,60 @@ async def change_subscription_plan(subscription_id: str, payload: SubscriptionCh
         }
     )
     return _subscription_response(record)
+
+
+# ==============================================================================
+# NODE.JS BILLING & INVOICE PROXY ROUTING
+# ==============================================================================
+from fastapi.responses import StreamingResponse
+import io
+
+@node_router.get("/invoice/{subscription_id}")
+async def get_invoice(subscription_id: str):
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.get(
+                f"{NODE_URL}invoice/{subscription_id}"
+            )
+            if response.status_code != 200:
+                raise HTTPException(status_code=response.status_code, detail="Invoice generation failed")
+            
+            return StreamingResponse(
+                io.BytesIO(response.content),
+                media_type="application/pdf",
+                headers={"Content-Disposition": f"attachment; filename=invoice-{subscription_id}.pdf"}
+            )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@node_router.get("/current-sub")
+async def get_node_current_sub(email: str = Query(...)):
+    try:
+        response = await HTTP_CLIENT.get(f"{NODE_URL}api/node/current-sub?email={email}")
+        return response.json()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@node_router.get("/plans")
+async def get_node_plans():
+    try:
+        response = await HTTP_CLIENT.get(f"{NODE_URL}api/node/plans")
+        return response.json()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@node_router.post("/plans")
+async def create_node_plan(payload: dict):
+    try:
+        response = await HTTP_CLIENT.post(f"{NODE_URL}api/node/plans", json=payload)
+        return response.json()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@node_router.delete("/plans/{id}")
+async def delete_node_plan(id: int):
+    try:
+        response = await HTTP_CLIENT.delete(f"{NODE_URL}api/node/plans/{id}")
+        return response.json()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
