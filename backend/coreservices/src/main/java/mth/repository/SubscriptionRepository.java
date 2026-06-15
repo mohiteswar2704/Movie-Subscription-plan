@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import mth.models.Subscription;
+import mth.models.Subscrip
 
 @Repository
 public interface SubscriptionRepository extends JpaRepository<Subscription, Long> {
