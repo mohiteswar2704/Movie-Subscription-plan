@@ -1,0 +1,94 @@
+services:
+  # 1. Spring Boot Web Service
+  - type: web
+    name: sdc-coreservices
+    env: java
+    rootDir: backend/coreservices
+    buildCommand: ./mvnw clean package -DskipTests
+    startCommand: java -jar target/coreservices-0.0.1-SNAPSHOT.jar
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        fromDatabase:
+          name: sdc-postgres
+          property: connectionString
+      - key: SPRING_DATASOURCE_USERNAME
+        fromDatabase:
+          name: sdc-postgres
+          property: user
+      - key: SPRING_DATASOURCE_PASSWORD
+        fromDatabase:
+          name: sdc-postgres
+          property: password
+
+  # 2. Node.js Web Service
+  - type: web
+    name: sdc-taskservices
+    env: node
+    rootDir: backend/task services
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: MONGO_URI
+        sync: false # You will enter your MongoDB Atlas URL in the Render UI
+      - key: PG_HOST
+        fromDatabase:
+          name: sdc-postgres
+          property: host
+      - key: PG_PORT
+        fromDatabase:
+          name: sdc-postgres
+          property: port
+      - key: PG_DATABASE
+        fromDatabase:
+          name: sdc-postgres
+          property: database
+      - key: PG_USER
+        fromDatabase:
+          name: sdc-postgres
+          property: user
+      - key: PG_PASSWORD
+        fromDatabase:
+          name: sdc-postgres
+          property: password
+
+  # 3. FastAPI API Gateway
+  - type: web
+    name: sdc-gateway
+    env: python
+    rootDir: backend/gateway
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: SPRING_URL
+        fromService:
+          type: web
+          name: sdc-coreservices
+          property: host
+      - key: NODE_URL
+        fromService:
+          type: web
+          name: sdc-taskservices
+          property: host
+
+  # 4. React Frontend (Static Site)
+  - type: web
+    name: sdc-frontend
+    env: static
+    rootDir: frontend
+    buildCommand: npm run build
+    publishDir: dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        fromService:
+          type: web
+          name: sdc-gateway
+          property: host
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+databases:
+  - name: sdc-postgres
+    databaseName: sdcproject
+    user: postgres
